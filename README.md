@@ -16,4 +16,4 @@ A lightweight, pure front-end web tool for comparing old photos with their resto
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/YOUR_GITHUB_USERNAME/OldPhotoRestoration.git
+   git clone https://github.com/couragefindsvalue/OldPhotoRestoration.git
