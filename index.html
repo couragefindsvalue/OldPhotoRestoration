@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>老照片对比 · 拖动竖线</title>
+<title>老照片对比工具 · 需配合豆包AI使用</title>
 <style>
   :root{
     --bg: #0d0f13;
@@ -14,6 +14,7 @@
     --txt-muted:#697386;
     --accent:#5b8def;
     --ok:#4ecb8d;
+    --warn:#f0b94d;
     --stage-bg:#15181d;
     --shadow: 0 20px 55px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05);
   }
@@ -42,6 +43,49 @@
     transition: background .3s, color .3s;
   }
   h1{ font-size:17px; font-weight:600; letter-spacing:.5px; margin:0; color:var(--txt); }
+
+  /* 顶部步骤条 */
+  .steps-bar {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+    width: 100%; max-width: 900px;
+    padding: 12px 18px; border-radius: 12px;
+    background: color-mix(in srgb, var(--panel) 90%, transparent);
+    border: 1px solid var(--line);
+    margin-bottom: 6px;
+  }
+  .step-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--txt-muted);
+    transition: color .3s;
+  }
+  .step-item.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .step-item.done {
+    color: var(--ok);
+  }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--line); color: var(--txt);
+    font-size: 12px; font-weight: 700;
+    transition: background .3s, color .3s;
+  }
+  .step-item.active .step-num { background: var(--accent); color: #fff; }
+  .step-item.done .step-num { background: var(--ok); color: #fff; }
+
+  /* 声明提示条 */
+  .alert-bar {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; max-width: 900px;
+    padding: 10px 16px; border-radius: 10px;
+    background: color-mix(in srgb, var(--warn) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+    color: var(--txt); font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .alert-bar svg { flex-shrink: 0; color: var(--warn); }
 
   /* 顶部工具栏 */
   .toolbar{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; width:100%; max-width:900px; }
@@ -153,11 +197,33 @@
 <body>
 
   <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:900px;">
-    <h1 id="i18n-title">老照片对比 · 拖动中间竖线</h1>
+    <h1 id="i18n-title">老照片对比工具 · 需配合豆包AI使用</h1>
     <div>
       <button type="button" class="btn icon" id="btnTheme" title="Toggle Theme">🌙</button>
       <button type="button" class="btn icon" id="btnLang" title="Switch Language">EN</button>
     </div>
+  </div>
+
+  <!-- 步骤引导条（新增） -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-item active" id="step1">
+      <span class="step-num">1</span>
+      <span id="i18n-step1">复制下方提示词</span>
+    </div>
+    <div class="step-item" id="step2">
+      <span class="step-num">2</span>
+      <span id="i18n-step2">粘贴到豆包生图</span>
+    </div>
+    <div class="step-item" id="step3">
+      <span class="step-num">3</span>
+      <span id="i18n-step3">下载生成图并上传对比</span>
+    </div>
+  </div>
+
+  <!-- 声明提示条（新增） -->
+  <div class="alert-bar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <span id="i18n-alert">注意：本工具不直接生成图片。请先复制提示词，到豆包生成修复图，再回到本页上传对比。</span>
   </div>
 
   <!-- 上传与操作区 -->
@@ -165,7 +231,7 @@
     <label class="btn upload" id="btnOld">📷 <span id="i18n-btnOld">上传原图</span>
       <input type="file" accept="image/*" id="fileOld">
     </label>
-    <label class="btn upload" id="btnNew">✨ <span id="i18n-btnNew">上传修复图</span>
+    <label class="btn upload" id="btnNew">✨ <span id="i18n-btnNew">上传豆包生成图</span>
       <input type="file" accept="image/*" id="fileNew">
     </label>
 
@@ -209,7 +275,7 @@
       <div class="divider" id="divider"><div class="handle">⇔</div></div>
       <span class="tag" id="tagOld">原图</span>
       <span class="tag" id="tagNew">修复后</span>
-      <div class="hint" id="hint">请上传「原图」和「修复图」两张照片，或直接拖拽图片到此处</div>
+      <div class="hint" id="hint">请先复制上方提示词去豆包生成修复图，再上传原图和修复图进行对比</div>
     </div>
   </div>
 
@@ -228,9 +294,13 @@ const PROMPT_EN = "Archive-grade professional old photo restoration, 8K ultra-hi
    ========================================================= */
 const i18nData = {
   zh: {
-    title: "老照片对比 · 拖动中间竖线",
+    title: "老照片对比工具 · 需配合豆包AI使用",
+    step1: "复制下方提示词",
+    step2: "粘贴到豆包生图",
+    step3: "下载生成图并上传对比",
+    alert: "注意：本工具不直接生成图片。请先复制提示词，到豆包生成修复图，再回到本页上传对比。",
     btnOld: "上传原图",
-    btnNew: "上传修复图",
+    btnNew: "上传豆包生成图",
     demoLabel: "加载示例：",
     btnReset: "重置分割",
     btnFull: "全屏",
@@ -241,7 +311,7 @@ const i18nData = {
     copyEn: "Copy English Prompt",
     tagOld: "原图",
     tagNew: "修复后",
-    hint: "请上传「原图」和「修复图」两张照片，或直接拖拽图片到此处",
+    hint: "请先复制上方提示词去豆包生成修复图，再上传原图和修复图进行对比",
     tip: "鼠标拖动 / 手指滑动 / ← → 方向键（按住 Shift 加速）<br>微调：Alt+方向键（步长1px），按住Shift可加速；滚轮缩放",
     copied: "已复制到剪贴板",
     copyFail: "复制失败，请手动选择",
@@ -249,9 +319,13 @@ const i18nData = {
     demoLoading: "正在加载示例图片..."
   },
   en: {
-    title: "Old Photo Compare · Drag the Divider",
+    title: "Old Photo Compare Tool · Use with Doubao AI",
+    step1: "Copy Prompt Below",
+    step2: "Generate in Doubao",
+    step3: "Download & Upload to Compare",
+    alert: "Note: This tool does NOT generate images. Please copy the prompt, generate a restored image in Doubao, then upload it here to compare.",
     btnOld: "Upload Original",
-    btnNew: "Upload Restored",
+    btnNew: "Upload Generated Image",
     demoLabel: "Load Demo:",
     btnReset: "Reset Split",
     btnFull: "Fullscreen",
@@ -262,7 +336,7 @@ const i18nData = {
     copyEn: "Copy English Prompt",
     tagOld: "Original",
     tagNew: "Restored",
-    hint: "Upload original and restored photos, or drag & drop images here",
+    hint: "Copy the prompt above to Doubao to generate a restored image, then upload both images here to compare.",
     tip: "Drag / Swipe / Arrow keys (Hold Shift to speed up)<br>Align: Alt+Arrows (1px), Hold Shift to speed up; Scroll to zoom",
     copied: "Copied!",
     copyFail: "Copy failed",
@@ -278,6 +352,10 @@ function setLanguage(lang) {
   const dict = i18nData[lang];
 
   document.getElementById('i18n-title').innerHTML = dict.title;
+  document.getElementById('i18n-step1').innerHTML = dict.step1;
+  document.getElementById('i18n-step2').innerHTML = dict.step2;
+  document.getElementById('i18n-step3').innerHTML = dict.step3;
+  document.getElementById('i18n-alert').innerHTML = dict.alert;
   document.getElementById('i18n-btnOld').innerHTML = dict.btnOld;
   document.getElementById('i18n-btnNew').innerHTML = dict.btnNew;
   document.getElementById('i18n-demoLabel').innerHTML = dict.demoLabel;
