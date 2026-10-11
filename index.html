@@ -155,8 +155,8 @@
   <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:900px;">
     <h1 id="i18n-title">老照片对比 · 拖动中间竖线</h1>
     <div>
-      <button class="btn icon" id="btnTheme" title="Toggle Theme">🌙</button>
-      <button class="btn icon" id="btnLang" title="Switch Language">EN</button>
+      <button type="button" class="btn icon" id="btnTheme" title="Toggle Theme">🌙</button>
+      <button type="button" class="btn icon" id="btnLang" title="Switch Language">EN</button>
     </div>
   </div>
 
@@ -179,27 +179,27 @@
       <option value="5">示例 5</option>
     </select>
 
-    <button class="btn" id="btnReset" title="Reset">🔄 <span id="i18n-btnReset">重置分割</span></button>
-    <button class="btn" id="btnFullscreen" title="Fullscreen">⛶ <span id="i18n-btnFull">全屏</span></button>
-    <button class="btn" id="btnDownload" title="Download">⬇️ <span id="i18n-btnDown">下载对比图</span></button>
+    <button type="button" class="btn" id="btnReset" title="Reset">🔄 <span id="i18n-btnReset">重置分割</span></button>
+    <button type="button" class="btn" id="btnFullscreen" title="Fullscreen">⛶ <span id="i18n-btnFull">全屏</span></button>
+    <button type="button" class="btn" id="btnDownload" title="Download">⬇️ <span id="i18n-btnDown">下载对比图</span></button>
   </div>
 
   <!-- 对齐微调区 -->
   <div class="align-panel">
     <span class="label" id="i18n-alignLabel">对齐微调 (仅移动修复图)：</span>
-    <button class="btn btn-small" id="adjUp">⬆️</button>
-    <button class="btn btn-small" id="adjDown">⬇️</button>
-    <button class="btn btn-small" id="adjLeft">⬅️</button>
-    <button class="btn btn-small" id="adjRight">➡️</button>
-    <button class="btn btn-small" id="adjZoomIn">➕</button>
-    <button class="btn btn-small" id="adjZoomOut">➖</button>
-    <button class="btn btn-small" id="adjReset">🔄 <span id="i18n-adjReset">对齐复位</span></button>
+    <button type="button" class="btn btn-small" id="adjUp">⬆️</button>
+    <button type="button" class="btn btn-small" id="adjDown">⬇️</button>
+    <button type="button" class="btn btn-small" id="adjLeft">⬅️</button>
+    <button type="button" class="btn btn-small" id="adjRight">➡️</button>
+    <button type="button" class="btn btn-small" id="adjZoomIn">➕</button>
+    <button type="button" class="btn btn-small" id="adjZoomOut">➖</button>
+    <button type="button" class="btn btn-small" id="adjReset">🔄 <span id="i18n-adjReset">对齐复位</span></button>
   </div>
 
   <!-- 提示词复制区 -->
   <div class="toolbar">
-    <button class="btn copy" id="copyZh" type="button">📋 <span id="i18n-copyZh">复制中文提示词</span></button>
-    <button class="btn copy" id="copyEn" type="button">📋 <span id="i18n-copyEn">Copy English Prompt</span></button>
+    <button type="button" class="btn copy" id="copyZh">📋 <span id="i18n-copyZh">复制中文提示词</span></button>
+    <button type="button" class="btn copy" id="copyEn">📋 <span id="i18n-copyEn">Copy English Prompt</span></button>
   </div>
 
   <div class="stage-wrapper">
@@ -217,7 +217,7 @@
 
 <script>
 /* =========================================================
-   提示词常量
+   提示词常量（复制用）
    ========================================================= */
 const PROMPT_ZH = "档案级专业老照片修复，8K超高分辨率。清除照片上所有污渍、霉斑、白点、划痕、折痕、黄化老化斑点、胶片损伤，移除截图黑边、界面文字、水印。重建面部、毛发、衣物纹理、背景丢失细节，严格保留人物原始五官样貌、神态表情、人物身份、原图构图、原始胶片摄影风格，禁止篡改面部特征。校正清晰度、光影、对比度、色彩平衡，色彩还原自然真实，不要过度饱和。保留适度原生胶片颗粒质感，不要完全磨平胶片肌理。如果原图为黑白照片，维持黑白，仅在明确要求上色时进行色彩修复。输出干净写实、自然高级的高质量存档照片，无畸变，五官不扭曲。【负面提示词：篡改五官，改变脸型，扭曲面部，换脸，面部变形，多余手指，畸形肢体，油画，动漫，卡通，插画，3D渲染，过度磨皮，皮肤塑料感，去除胶片颗粒，超饱和色彩，夸张美颜，新增物体，改变构图，移动人物，删除人物，添加人物，文字，水印，UI界面，截图边框，黑边，涂鸦，噪点爆炸，强光眩光，重影，模糊畸变，修复过度，不真实皮肤，虚假纹理。】";
 
@@ -453,16 +453,41 @@ function setLanguage(lang) {
     }
   });
 
-  /* ============ 7. 对齐控制按钮绑定 ============ */
+  /* ============ 7. 对齐控制按钮绑定（修复版） ============ */
   document.getElementById('adjUp').addEventListener('click', (e) => adjustNew(0, -1, 0, e));
   document.getElementById('adjDown').addEventListener('click', (e) => adjustNew(0, 1, 0, e));
   document.getElementById('adjLeft').addEventListener('click', (e) => adjustNew(-1, 0, 0, e));
   document.getElementById('adjRight').addEventListener('click', (e) => adjustNew(1, 0, 0, e));
   document.getElementById('adjZoomIn').addEventListener('click', (e) => adjustNew(0, 0, 0.01, e));
   document.getElementById('adjZoomOut').addEventListener('click', (e) => adjustNew(0, 0, -0.01, e));
-  document.getElementById('adjReset').addEventListener('click', () => {
-    newTx = 0; newTy = 0; newScale = 1;
+
+  // 修复：对齐复位功能（添加视觉反馈，防止事件冒泡）
+  document.getElementById('adjReset').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 重置状态：修复图的位移/缩放归零，并把分割线放回中线(50%)
+    newTx = 0;
+    newTy = 0;
+    newScale = 1;
     applyNewTransform();
+    setPos(50);
+
+    // 给用户一个视觉反馈，证明按钮确实生效了
+    const btn = e.currentTarget;
+    const span = btn.querySelector('span');
+    if (span) {
+      const originalText = span.innerText;
+      span.innerText = currentLang === 'zh' ? '已复位' : 'Reset Done';
+      btn.style.borderColor = 'var(--ok)';
+      btn.style.color = 'var(--ok)';
+
+      setTimeout(() => {
+        span.innerText = originalText;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 1000);
+    }
   });
 
   /* ============ 8. 加载 GitHub 示例图片 ============ */
@@ -523,7 +548,6 @@ function setLanguage(lang) {
 
   // 页面初次加载时，自动加载示例 1
   window.addEventListener('DOMContentLoaded', () => {
-    // 延迟一点，等 DOM 完全准备好
     setTimeout(() => loadDemoPair(1), 100);
   });
 
@@ -586,11 +610,29 @@ function setLanguage(lang) {
     ctx.shadowBlur = 10;
     ctx.stroke();
 
-    // 4. 导出下载
-    const link = document.createElement('a');
-    link.download = `compare_${Date.now()}.jpg`;
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
-    link.click();
+    // 4. 导出下载（使用 toBlob，并捕获跨域/本地文件导致的画布污染错误）
+    try {
+      canvas.toBlob(function (blob) {
+        if (!blob) {
+          alert(currentLang === 'zh'
+            ? '导出失败：图片过大或浏览器不支持。'
+            : 'Export failed: image too large or unsupported.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `compare_${Date.now()}.jpg`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }, 'image/jpeg', 0.95);
+    } catch (err) {
+      alert(currentLang === 'zh'
+        ? '导出失败：页面是以本地文件(file://)方式打开的，浏览器禁止导出示例图片。\n请改用「上传原图/上传修复图」，或用本地服务器(如 python -m http.server)/GitHub Pages 打开页面。'
+        : 'Export failed: the page is opened via file://, so the browser blocks exporting demo images.\nUpload images manually, or serve the page via a local server / GitHub Pages.');
+    }
   });
 
   /* ============ 12. 主题切换 ============ */
